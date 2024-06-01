@@ -1,8 +1,9 @@
 //#![feature(array_chunks)]
 //#![feature(portable_simd)]
 
-pub mod coeffs;
+use coeffs::get_coeffs;
 
+pub mod coeffs;
 
 //use iter_comprehensions::map;
 //use std::f64::consts;
@@ -129,6 +130,31 @@ pub fn rolling_average_iter_vec<const N: i32, const M: usize>(
         .for_each(|(a, b)| *b = *a * inv);
 }
 
+#[inline(never)]
+pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
+    let coeffs = get_coeffs::<WINDOW, M>();
+    assert!(buf.len() == data.len());
+    let body_size = data.len() - WINDOW;
+    let a = buf
+        .iter_mut()
+        .zip(data.windows(WINDOW))
+        .skip(WINDOW / 2)
+        .take(body_size); // fucking OBOB
+    dbg!(&a);
+    a.for_each(|(buf, data)| {
+        *buf = coeffs
+            .iter()
+            .zip(data.iter())
+            .map(|(a, b)| {
+                dbg!(&data);
+                assert!(coeffs.len() == data.len());
+                dbg!(&a, &b);
+                a * b
+            })
+            .sum::<f64>();
+    })
+}
+
 /*
 #[inline(never)]
 pub fn rolling_average_simd_array<const N: usize, const M: usize>(
@@ -165,47 +191,6 @@ fn rolling_avg_const_size_window_simdf64x8() {
     assert!(true);
 
     //assert_eq!(b, rhs);
-}
-
-// J = T[(i - M - 1 )^(j - 1) for i = 1:2M + 1, j = 1:N + 1]
-// e₁ = [one(T); zeros(T,N)]
-// C = J' \ e₁
-/*
-#[macro_export]
-macro_rules!  get_rolling_coeffs {
-    ($WINDOW_SIZE: expr, $M: expr) => {
-        {
-        let vec = map!(
-            ((i - $M - 1) as i32).pow((j as u32) - 1) as f64;
-                i in 1..=(2*$M + 1),
-                j in 1..=($WINDOW_SIZE+1))
-            .collect::<Vec<f64>>();
-        let J = DMatrix::from_vec($WINDOW_SIZE + 1, 2*$M + 1, vec);
-        let mut temp = vec![1.0];
-        let mut zeros = vec![0.0; $M];
-        temp.append(&mut zeros);
-        let e_1 = DVector::from_vec(temp);
-        println!("e_1 len is {}", e_1.len());
-        println!("J len is {}", J.len());
-        let jtick = J.adjoint();
-        let decomp = jtick.lu();
-
-        let C = decomp.solve(&e_1).expect("Linear resolution failed");
-        C
-        }
-    };
-}
-*/
-
-fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(// invec: [f64; M],
-    // outvec: [f64; M],
-) -> Vec<f64> {
-    // J = T[(i - M - 1 )^(j - 1) for i = 1:2M + 1, j = 1:N + 1]
-    // e₁ = [one(T); zeros(T,N)]
-    // C = J' \ e₁
-    //let C = get_rolling_coeffs!(WINDOW_SIZE, M);
-    //dbg!(C);
-    vec![1.0]
 }
 
 mod tests {

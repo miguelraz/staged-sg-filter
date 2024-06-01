@@ -2,14 +2,13 @@
 #![allow(unused_imports)]
 
 use iter_comprehensions::map;
-use staged_sg_filter::coeffs::COEFFS;
+use staged_sg_filter::sav_gol;
 
 fn main() {
-    // N = 3
-    const N: usize = 3;
-    const WINDOW_SIZE: usize = 2 * N + 1;
-    //let vec = hmap.get(&(N, 1)).unwrap().to_vec();
-    let coeffs = COEFFS[0][0];
+    let v = vec![0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0];
+    let mut buf = vec![0.0; 7];
+    //pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
+    sav_gol::<1, 1>(&mut buf, &v);
 
-    println!("{:?}", coeffs);
+    println!("{:?}", buf);
 }
