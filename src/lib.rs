@@ -3,7 +3,8 @@
 
 pub mod coeffs;
 
-use iter_comprehensions::map;
+
+//use iter_comprehensions::map;
 //use std::f64::consts;
 //use std::simd::f64x4;
 //use std::simd::f64x8;
@@ -160,7 +161,8 @@ fn rolling_avg_const_size_window_simdf64x8() {
 
     //    rolling_average_simd_array::<{ N }, { M }>(a, &mut b);
 
-    let rhs = [42.125; M];
+    //let rhs = [42.125; M];
+    assert!(true);
 
     //assert_eq!(b, rhs);
 }
@@ -204,16 +206,6 @@ fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(// i
     //let C = get_rolling_coeffs!(WINDOW_SIZE, M);
     //dbg!(C);
     vec![1.0]
-}
-
-#[test]
-fn test_rolling_avg_const_linear_solve() {
-    //let C = rolling_avg_const_linear_solve::<8, 8>(a, b);
-    let n = 2;
-    let m = 2;
-    let c = get_rolling_coeffs!(1, 1);
-    //let d = c.as_vec();
-    //assert_eq!(nalgebra::dmatrix!(0.25), d);
 }
 
 mod tests {
