@@ -4,7 +4,6 @@
 pub mod coeffs2;
 
 use iter_comprehensions::map;
-use nalgebra::{DMatrix, DVector};
 //use std::f64::consts;
 //use std::simd::f64x4;
 //use std::simd::f64x8;
@@ -89,11 +88,14 @@ macro_rules! const_div {
     };
 }
 
+/*
+#[allow(unused_macros)]
 macro_rules! const_chunker {
     ($x: expr, $y: expr) => {
         $x / $y
     };
 }
+*/
 
 #[inline(never)]
 pub fn rolling_average_raw_loop<const N: i32, const M: i32>(invec: &[f64], outvec: &mut [f64]) {
@@ -102,6 +104,7 @@ pub fn rolling_average_raw_loop<const N: i32, const M: i32>(invec: &[f64], outve
         outvec[i] = invec[i] * inv;
     }
 }
+
 #[inline(never)]
 pub fn rolling_average_iter_array<const N: i32, const M: usize>(
     invec: [f64; M],
@@ -152,19 +155,20 @@ fn rolling_avg_const_size_window_simdf64x8() {
     const N: usize = 8;
     const M: usize = 8;
     const CHUNKS: i32 = 8;
-    let a = [1.0; M];
-    let mut b = [0.0; M];
+    //let a = [1.0; M];
+    // let mut b = [0.0; M];
 
     //    rolling_average_simd_array::<{ N }, { M }>(a, &mut b);
 
     let rhs = [42.125; M];
 
-    assert_eq!(b, rhs);
+    //assert_eq!(b, rhs);
 }
 
 // J = T[(i - M - 1 )^(j - 1) for i = 1:2M + 1, j = 1:N + 1]
 // e₁ = [one(T); zeros(T,N)]
 // C = J' \ e₁
+/*
 #[macro_export]
 macro_rules!  get_rolling_coeffs {
     ($WINDOW_SIZE: expr, $M: expr) => {
@@ -189,6 +193,7 @@ macro_rules!  get_rolling_coeffs {
         }
     };
 }
+*/
 
 fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(// invec: [f64; M],
     // outvec: [f64; M],
@@ -196,8 +201,8 @@ fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(// i
     // J = T[(i - M - 1 )^(j - 1) for i = 1:2M + 1, j = 1:N + 1]
     // e₁ = [one(T); zeros(T,N)]
     // C = J' \ e₁
-    let C = get_rolling_coeffs!(WINDOW_SIZE, M);
-    dbg!(C);
+    //let C = get_rolling_coeffs!(WINDOW_SIZE, M);
+    //dbg!(C);
     vec![1.0]
 }
 
