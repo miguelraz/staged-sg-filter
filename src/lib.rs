@@ -1,7 +1,7 @@
 //#![feature(array_chunks)]
 //#![feature(portable_simd)]
 
-pub mod coeffs2;
+pub mod coeffs;
 
 use iter_comprehensions::map;
 //use std::f64::consts;
