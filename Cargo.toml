@@ -11,6 +11,8 @@ description = "A staged programming implementation for Savitzky-Golay filters. L
 divan = "0.1.0"
 iter-comprehensions = "1.0.0"
 nalgebra = "0.32.5"
+ndarray = "0.15.6"
+ndarray-linalg = "0.16.0"
 semver-checks = "0.0.1"
 
 [[bench]]

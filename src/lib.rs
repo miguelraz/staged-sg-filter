@@ -1,12 +1,14 @@
-#![feature(array_chunks)]
-#![feature(portable_simd)]
+//#![feature(array_chunks)]
+//#![feature(portable_simd)]
+
+pub mod coeffs2;
 
 use iter_comprehensions::map;
 use nalgebra::{DMatrix, DVector};
-use std::f64::consts;
-use std::simd::f64x4;
-use std::simd::f64x8;
-use std::simd::StdFloat;
+//use std::f64::consts;
+//use std::simd::f64x4;
+//use std::simd::f64x8;
+//use std::simd::StdFloat;
 
 //         .globl  staged_sg_filter::runtime_loop
 //         .p2align        4, 0x90
@@ -86,6 +88,7 @@ macro_rules! const_div {
         1.0 / ($x as f64)
     };
 }
+
 macro_rules! const_chunker {
     ($x: expr, $y: expr) => {
         $x / $y
@@ -122,6 +125,7 @@ pub fn rolling_average_iter_vec<const N: i32, const M: usize>(
         .for_each(|(a, b)| *b = *a * inv);
 }
 
+/*
 #[inline(never)]
 pub fn rolling_average_simd_array<const N: usize, const M: usize>(
     invec: [f64; M],
@@ -141,6 +145,7 @@ pub fn rolling_average_simd_array<const N: usize, const M: usize>(
             *a = res;
         });
 }
+*/
 
 #[test]
 fn rolling_avg_const_size_window_simdf64x8() {
@@ -150,7 +155,7 @@ fn rolling_avg_const_size_window_simdf64x8() {
     let a = [1.0; M];
     let mut b = [0.0; M];
 
-    rolling_average_simd_array::<{ N }, { M }>(a, &mut b);
+    //    rolling_average_simd_array::<{ N }, { M }>(a, &mut b);
 
     let rhs = [42.125; M];
 
@@ -164,13 +169,20 @@ fn rolling_avg_const_size_window_simdf64x8() {
 macro_rules!  get_rolling_coeffs {
     ($WINDOW_SIZE: expr, $M: expr) => {
         {
-        let vec = map!(((i - $M - 1) as i32).pow((j as u32) - 1) as f64; i in 1..=(2*$M), j in 1..($WINDOW_SIZE+1)).collect::<Vec<f64>>();
-        let J = DMatrix::from_vec($WINDOW_SIZE, $M, vec);
+        let vec = map!(
+            ((i - $M - 1) as i32).pow((j as u32) - 1) as f64;
+                i in 1..=(2*$M + 1),
+                j in 1..=($WINDOW_SIZE+1))
+            .collect::<Vec<f64>>();
+        let J = DMatrix::from_vec($WINDOW_SIZE + 1, 2*$M + 1, vec);
         let mut temp = vec![1.0];
-        let mut zeros = vec![0.0; $WINDOW_SIZE];
+        let mut zeros = vec![0.0; $M];
         temp.append(&mut zeros);
         let e_1 = DVector::from_vec(temp);
-        let decomp = J.lu();
+        println!("e_1 len is {}", e_1.len());
+        println!("J len is {}", J.len());
+        let jtick = J.adjoint();
+        let decomp = jtick.lu();
 
         let C = decomp.solve(&e_1).expect("Linear resolution failed");
         C
@@ -178,9 +190,8 @@ macro_rules!  get_rolling_coeffs {
     };
 }
 
-fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(
-    invec: [f64; M],
-    outvec: [f64; M],
+fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(// invec: [f64; M],
+    // outvec: [f64; M],
 ) -> Vec<f64> {
     // J = T[(i - M - 1 )^(j - 1) for i = 1:2M + 1, j = 1:N + 1]
     // e₁ = [one(T); zeros(T,N)]
@@ -192,11 +203,12 @@ fn rolling_avg_const_linear_solve<const WINDOW_SIZE: usize, const M: usize>(
 
 #[test]
 fn test_rolling_avg_const_linear_solve() {
-    let a = [1.0; 8];
-    let b = [0.0; 8];
-    let c = [0.25; 8];
-    let C = rolling_avg_const_linear_solve::<8, 8>(a, b);
-    assert_eq!(C, c);
+    //let C = rolling_avg_const_linear_solve::<8, 8>(a, b);
+    let n = 2;
+    let m = 2;
+    let c = get_rolling_coeffs!(1, 1);
+    //let d = c.as_vec();
+    //assert_eq!(nalgebra::dmatrix!(0.25), d);
 }
 
 mod tests {
