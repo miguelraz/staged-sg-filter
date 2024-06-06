@@ -47,6 +47,17 @@ fn main() {
 
 runs in about 100ms.
 
+Using `divan` on a vector of `10_000_000` `f64`'s gives::
+
+```
+     Running benches\divan.rs (target\release\deps\divan-fb5954a85863758b.exe)
+Timer precision: 100 ns
+divan      fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ savgol  205.8 ms      │ 297.4 ms      │ 218.5 ms      │ 219.6 ms      │ 100     │ 100
+```
+
+which means it's churning through about `10_000_000/0.2 ≈ 5e7` elements per second or `5e7 * 10e-9 ≈ 0.5` elements per nanosecond. Not bad!
+
 ## Notes
 
 It's called "staged" because the computation is done in "stages", which allows the compiler to optimize the code a lot more - namely, the use of const generics in Rust provide more opportunities for profitable loop unrolling and proper SIMD lane-width usage.

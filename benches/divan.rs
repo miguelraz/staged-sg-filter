@@ -1,4 +1,5 @@
-use staged_sg_filter::*;
+use staged_sg_filter::sav_gol;
+//use staged_sg_filter::utils::*;
 
 use divan::black_box as bb;
 
@@ -7,6 +8,7 @@ fn main() {
     divan::main();
 }
 
+/*
 // Define a `fibonacci` function and register it for benchmarking.
 #[divan::bench]
 fn divan_runtime_loop() -> i32 {
@@ -72,4 +74,13 @@ fn div_rt_loop() -> f32 {
 #[divan::bench]
 fn div_ct_loop() -> f32 {
     div_consttime_loop::<2>(bb(100.0))
+}
+
+*/
+#[divan::bench]
+fn savgol() -> f64 {
+    let v = vec![10.0; 10_000_000];
+    let mut buf = vec![0.0; 10_000_000];
+    sav_gol::<1, 1>(bb(&mut buf), bb(&v));
+    buf[0]
 }
