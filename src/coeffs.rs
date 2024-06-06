@@ -19,7 +19,7 @@ julia> let
 */
 
 
-pub static COEFFS: [[&[f64]; 25]; 10] = [
+pub const COEFFS: [[&[f64]; 25]; 10] = [
 //1 1
 [
     &[0.3333333333333332, 0.3333333333333333, 0.3333333333333334],
@@ -533,13 +533,17 @@ pub static COEFFS: [[&[f64]; 25]; 10] = [
 
 pub fn get_coeffs<const WINDOW: usize, const M: usize>() -> &'static [f64] {
     if 25 < WINDOW {
-        panic!("WINDOW must be 0 < WINDOW < 25, you gave {WINDOW}");
+        panic!("WINDOW must be 0 <= WINDOW < 25");
     }
-    if 10 < M {
-        panic!("M must be 0 < M < 10, you gave {M}");
+    if 0 < M && 10 < M {
+        panic!("M must be 1 <= M < 10");
     }
+    //let m @ 1..9 = M else {
+    //    panic!("silly but I like it");
+    //}
 
     COEFFS[M - 1][WINDOW/2]
+    //unsafe {*COEFFS.get_unchecked(M - 1).get_unchecked(WINDOW/2)}
 }
 
 #[test]

@@ -6,8 +6,9 @@ use coeffs::get_coeffs;
 pub mod coeffs;
 
 /// Small utility function to clean up the `sav_gol` filter
+#[inline]
 pub fn dot_prod_update(buf: &mut f64, data: &[f64], coeffs: &[f64]) {
-    assert!(data.len() == coeffs.len());
+    //assert!(data.len() == coeffs.len());
     *buf = data
         .iter()
         .zip(coeffs.iter())
@@ -43,7 +44,6 @@ fn test_dot_prod_update() {
 ///```
 pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut [f64], data: &[f64]) {
     let coeffs = get_coeffs::<WINDOW, M>();
-    assert!(buf.len() == data.len());
     let window_size = 2 * WINDOW + 1;
     let body_size = data.len() - (window_size - 1);
     buf.iter_mut()
@@ -71,6 +71,13 @@ fn test_sav_gol() {
         7.0,
     ];
     assert_eq!(res, buf);
+}
+// dynamic data (must accept args)
+// mark as #[inline(never)]
+// cargo asm --lib
+#[inline(never)]
+pub fn dummy(buf: &mut [f64], data: &mut [f64]) {
+    sav_gol::<1, 3>(buf, &data);
 }
 
 #[cfg(feature = "rayon")]
