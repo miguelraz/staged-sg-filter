@@ -118,6 +118,7 @@ pub fn rolling_average_iter_array<const N: i32, const M: usize>(
         .zip(outvec.iter_mut())
         .for_each(|(a, b)| *b = *a * inv);
 }
+
 #[inline(never)]
 pub fn rolling_average_iter_vec<const N: i32, const M: usize>(
     invec: Vec<f64>,
@@ -131,20 +132,41 @@ pub fn rolling_average_iter_vec<const N: i32, const M: usize>(
 }
 
 #[inline(never)]
+pub fn dot_prod_update(buf: &mut f64, data: &[f64], coeffs: &[f64]) {
+    assert!(data.len() == coeffs.len());
+    *buf = data
+        .iter()
+        .zip(coeffs.iter())
+        .map(|(a, b)| a * b)
+        .sum::<f64>();
+}
+#[test]
+fn test_dot_prod_update() {
+    let mut buf = 0.0;
+    let data = vec![1.0; 4];
+    let coeffs = vec![0.25; 4];
+    dot_prod_update(&mut buf, &data, &coeffs);
+    assert_eq!(buf, 1.0);
+}
+
+#[inline(never)]
 pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
     let coeffs = get_coeffs::<WINDOW, M>();
+    dbg!("WINDOW {}", WINDOW);
     assert!(buf.len() == data.len());
-    let body_size = data.len() - WINDOW;
+    let window_size = 2 * WINDOW + 1;
+    let body_size = data.len() - (window_size - 1);
+    dbg!("body_size len {}", body_size);
     let a = buf
         .iter_mut()
-        .zip(data.windows(WINDOW))
-        .skip(WINDOW / 2)
+        .skip(window_size / 2)
+        .zip(data.windows(window_size))
         .take(body_size); // fucking OBOB
-    dbg!(&a);
+                          //dbg!({ a.collect::<Vec<_>>() });
     a.for_each(|(buf, data)| {
-        *buf = coeffs
+        *buf = data
             .iter()
-            .zip(data.iter())
+            .zip(coeffs)
             .map(|(a, b)| {
                 dbg!(&data);
                 assert!(coeffs.len() == data.len());
