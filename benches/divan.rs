@@ -1,4 +1,4 @@
-use staged_sg_filter::sav_gol;
+use staged_sg_filter::{sav_gol, sav_gol_f32};
 //use staged_sg_filter::utils::*;
 
 use divan::black_box as bb;
@@ -82,5 +82,12 @@ fn savgol() -> f64 {
     let v = vec![10.0; 10_000_000];
     let mut buf = vec![0.0; 10_000_000];
     sav_gol::<1, 1>(bb(&mut buf), bb(&v));
+    buf[0]
+}
+#[divan::bench]
+fn savgol_f32() -> f32 {
+    let v = vec![10.0f32; 10_000_000];
+    let mut buf = vec![0.0f32; 10_000_000];
+    sav_gol_f32::<1, 1>(bb(&mut buf), bb(&v));
     buf[0]
 }

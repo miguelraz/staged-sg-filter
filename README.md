@@ -66,16 +66,24 @@ You are expected to have FMA and AVX2 compatible hardware (at least). Compile wi
 
 Decent efforts have been made to ensure
 
+* minimal dependencies and fast builds
 * auto-vectorization fires off with the help of `cargo-remark`
-* as much computation is pushed to compile time
+* as much computation is pushed to compile time with the use of precomputed coefficients and `const` generics
 * the hot path is allocation and panic-free
+
+## Algorithm
+
+1. Calculate the coefficients of interest in Julia, copy/paste them into `coeffs/_f32.rs` appropriately and declare them as `const`.
+2. Do a fixed-size rolling window dot_product with half the elements of the dot product as the `coeffs` obtained previously.
+3. Update each element of a `buf`fer
+4. Parallelize with Rayon
 
 ## TODO
 
 - [X] rayon support
 - [X] Just calculate NxM up to 12x12 and cache that
-- [ ] fma support
+- [X] fma support
+- [X] f32/f64 float support
 - [ ] SIMD support
-- [ ] f32 support
-- [ ] consider `no_std` [Effective Rust link](https://www.lurklurk.org/effective-rust/no-std.html)
+- [ ] `no_std` support see([Effective Rust link](https://www.lurklurk.org/effective-rust/no-std.html))
 - [ ] support derivatives (stretch goal - sponsor me???)
