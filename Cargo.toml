@@ -9,9 +9,12 @@ description = "A staged programming implementation for Savitzky-Golay filters. L
 
 [dependencies]
 divan = "0.1.0"
-iter-comprehensions = "1.0.0"
+rayon = "1.10.0"
 semver-checks = "0.0.1"
+
 
 [[bench]]
 name = "divan"
 harness = false
+
+[features]

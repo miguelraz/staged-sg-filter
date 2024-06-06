@@ -5,6 +5,74 @@ use coeffs::get_coeffs;
 
 pub mod coeffs;
 
+/// Savitzky-Golay smoothing filter
+///
+/// Iterator element type is `f32`/`f64`.
+///
+/// If `WINDOW` is `1` then `window_size` is `3` (1 on either side plus the element itself.)
+/// If `M` is `3` then `3` statistical momenta are conserved.
+///
+/// This filter ignores elements on the fringes (starting and ending `window_size`) elements of the array.
+/// There also exists a parallel version of this filter as `par_sav_gol`, behind a feature flag `par_sav_gol`.
+/// ```
+///     use staged_sg_filter::sav_gol;
+///     let mut buf = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
+///     let mut buf = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
+///     sav_gol::<1, 1>(&mut buf, &v);
+///     let res = vec[1.0, 3.333333333333333, 6.666666666666666, 3.333333333333333, 6.666666666666666, 3.333333333333333, 7.0, ];
+///     assert_eq!(res, buf);
+///```
+#[inline(never)]
+pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
+    let coeffs = get_coeffs::<WINDOW, M>();
+    assert!(buf.len() == data.len());
+    let window_size = 2 * WINDOW + 1;
+    let body_size = data.len() - (window_size - 1);
+    buf.iter_mut()
+        .skip(window_size / 2)
+        .zip(data.windows(window_size))
+        .take(body_size)
+        .for_each(|(buf, data)| {
+            dot_prod_update(buf, &data, &coeffs);
+        });
+}
+#[test]
+fn test_sav_gol() {
+    let v = vec![0.0, 10.0, 0.0, 10.0, 0.0, 10.0, 0.0];
+    let mut buf = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
+    sav_gol::<1, 1>(&mut buf, &v);
+    let res = vec![
+        1.0,
+        3.333333333333333,
+        6.666666666666666,
+        3.333333333333333,
+        6.666666666666666,
+        3.333333333333333,
+        7.0,
+    ];
+    assert_eq!(res, buf);
+}
+/*
+#[cfg(feature = "par_sav_gol")]
+pub fn par_sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
+    let coeffs = get_coeffs::<WINDOW, M>();
+    assert!(buf.len() == data.len());
+    let window_size = 2 * WINDOW + 1;
+    let body_size = data.len() - (window_size - 1);
+    buf.par_iter_mut()
+        .skip(window_size / 2)
+        .zip(data.windows(window_size))
+        .take(body_size)
+        .for_each(|(buf, data)| {
+            dot_prod_update(buf, &data, &coeffs);
+        });
+}
+*/
+
+// From here on , it's just my lil' experiments, feel free to ignore
+// -----------------------------------------------------------------
+//
+
 //use iter_comprehensions::map;
 //use std::f64::consts;
 //use std::simd::f64x4;
@@ -90,15 +158,6 @@ macro_rules! const_div {
     };
 }
 
-/*
-#[allow(unused_macros)]
-macro_rules! const_chunker {
-    ($x: expr, $y: expr) => {
-        $x / $y
-    };
-}
-*/
-
 #[inline(never)]
 pub fn rolling_average_raw_loop<const N: i32, const M: i32>(invec: &[f64], outvec: &mut [f64]) {
     let inv = const_div!(N);
@@ -152,32 +211,32 @@ fn test_dot_prod_update() {
 #[inline(never)]
 pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &Vec<f64>) {
     let coeffs = get_coeffs::<WINDOW, M>();
-    dbg!("WINDOW {}", WINDOW);
     assert!(buf.len() == data.len());
     let window_size = 2 * WINDOW + 1;
     let body_size = data.len() - (window_size - 1);
-    dbg!("body_size len {}", body_size);
-    let a = buf
-        .iter_mut()
+    buf.iter_mut()
         .skip(window_size / 2)
         .zip(data.windows(window_size))
-        .take(body_size) // fucking OBOB
-        //dbg!({ a.collect::<Vec<_>>() });
+        .take(body_size)
         .for_each(|(buf, data)| {
-            /*
-            *buf = data
-                .iter()
-                .zip(coeffs)
-                .map(|(a, b)| {
-                    dbg!(&data);
-                    assert!(coeffs.len() == data.len());
-                    dbg!(&a, &b);
-                    a * b
-                })
-                .sum::<f64>();
-                */
             dot_prod_update(buf, &data, &coeffs);
         });
+}
+#[test]
+fn test_sav_gol() {
+    let v = vec![0.0, 10.0, 0.0, 10.0, 0.0, 10.0, 0.0];
+    let mut buf = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
+    sav_gol::<1, 1>(&mut buf, &v);
+    let res = vec![
+        1.0,
+        3.333333333333333,
+        6.666666666666666,
+        3.333333333333333,
+        6.666666666666666,
+        3.333333333333333,
+        7.0,
+    ];
+    assert_eq!(res, buf);
 }
 
 /*
