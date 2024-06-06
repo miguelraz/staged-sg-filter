@@ -8,9 +8,8 @@ description = "A staged programming implementation for Savitzky-Golay filters. L
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rayon = { version = "1.10.0", optional = true }
 divan = "0.1.0"
-rayon = "1.10.0"
-semver-checks = "0.0.1"
 
 
 [[bench]]
