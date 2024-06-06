@@ -13,6 +13,8 @@ pub fn dot_prod_update(buf: &mut f64, data: &[f64], coeffs: &[f64]) {
         .iter()
         .zip(coeffs.iter())
         .map(|(a, b)| a * b)
+        // TODO: FMA
+        //.fold(0.0, |acc, (a, b)| acc.mul_add(a, b))
         .sum::<f64>();
 }
 
