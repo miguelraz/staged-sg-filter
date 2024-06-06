@@ -19,6 +19,7 @@ It's called "staged" because the computation is done in "stages", which allows t
 
 Decent efforts have been made to ensure
 
+* you are expected to have FMA and AVX2 compatible hardware (at least). Compile with `RUSTFLAGS="-C target-cpu=native" cargo run --release` for best performance.
 * auto-vectorization fires off with the help of `cargo-remark`
 * as much computation is pushed to compile time
 * the hot path is allocation and panic-free
