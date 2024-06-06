@@ -5,7 +5,11 @@
 * `rayon` support is available via a `rayon` feature flag
 * Still some SIMD perf left on the table - newer versions will focus on perf
 
-* Remeber to compile this with `RUSTFLAGS="-C target-cpu=native"`.
+* Remember to compile this with `RUSTFLAGS="-C target-cpu=native"`.
+
+This code is based on another code I adapted in Julia with much help from others, see [StagedFilters.jl](https://github.com/miguelraz/StagedFilters.jl).
+
+NB. It's called "staged" because the computation is done in "stages", which allows the compiler to optimize the code a lot more - namely, the use of const generics in Rust provide more opportunities for profitable loop unrolling and proper SIMD lane-width usage.
 
 ## TODO
 
