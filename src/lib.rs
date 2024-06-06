@@ -161,20 +161,23 @@ pub fn sav_gol<const WINDOW: usize, const M: usize>(buf: &mut Vec<f64>, data: &V
         .iter_mut()
         .skip(window_size / 2)
         .zip(data.windows(window_size))
-        .take(body_size); // fucking OBOB
-                          //dbg!({ a.collect::<Vec<_>>() });
-    a.for_each(|(buf, data)| {
-        *buf = data
-            .iter()
-            .zip(coeffs)
-            .map(|(a, b)| {
-                dbg!(&data);
-                assert!(coeffs.len() == data.len());
-                dbg!(&a, &b);
-                a * b
-            })
-            .sum::<f64>();
-    })
+        .take(body_size) // fucking OBOB
+        //dbg!({ a.collect::<Vec<_>>() });
+        .for_each(|(buf, data)| {
+            /*
+            *buf = data
+                .iter()
+                .zip(coeffs)
+                .map(|(a, b)| {
+                    dbg!(&data);
+                    assert!(coeffs.len() == data.len());
+                    dbg!(&a, &b);
+                    a * b
+                })
+                .sum::<f64>();
+                */
+            dot_prod_update(buf, &data, &coeffs);
+        });
 }
 
 /*
