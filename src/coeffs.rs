@@ -18,7 +18,7 @@ julia> let
        end
 */
 
-
+#[rustfmt::skip]
 pub const COEFFS: [[&[f64]; 25]; 10] = [
 //1 1
 [
@@ -542,7 +542,7 @@ pub fn get_coeffs<const WINDOW: usize, const M: usize>() -> &'static [f64] {
     //    panic!("silly but I like it");
     //}
 
-    COEFFS[M - 1][WINDOW/2]
+    COEFFS[M - 1][WINDOW / 2]
     //unsafe {*COEFFS.get_unchecked(M - 1).get_unchecked(WINDOW/2)}
 }
 
@@ -559,12 +559,17 @@ fn test_get_coeffs1() {
     let ans = [0.3333333333333332, 0.33333333333333333, 0.3333333333333334];
 
     assert_eq!(coeffs, ans);
-
 }
 #[test]
 fn test_get_coeffs2() {
     let coeffs = get_coeffs::<2, 2>();
-    let ans =  [-0.08571428571428576, 0.34285714285714286, 0.48571428571428565, 0.34285714285714286, -0.08571428571428574];
+    let ans = [
+        -0.08571428571428576,
+        0.34285714285714286,
+        0.48571428571428565,
+        0.34285714285714286,
+        -0.08571428571428574,
+    ];
 
     assert_eq!(coeffs, ans);
 }
