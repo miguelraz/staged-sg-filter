@@ -535,8 +535,8 @@ pub fn get_coeffs<const WINDOW: usize, const M: usize>() -> &'static [f64] {
     if 25 < WINDOW {
         panic!("WINDOW must be 0 <= WINDOW < 25");
     }
-    if 0 < M && 10 < M {
-        panic!("M must be 1 <= M < 10");
+    if !(1..=10).contains(&M) {
+        panic!("M must be 1 <= M <= 10");
     }
     //let m @ 1..9 = M else {
     //    panic!("silly but I like it");
@@ -554,12 +554,19 @@ fn test_coeffs() {
 }
 
 #[test]
+#[should_panic(expected = "M must be")]
+fn test_get_coeffs0() {
+    get_coeffs::<3, 0>();
+}
+
+#[test]
 fn test_get_coeffs1() {
     let coeffs = get_coeffs::<1, 1>();
     let ans = [0.3333333333333332, 0.33333333333333333, 0.3333333333333334];
 
     assert_eq!(coeffs, ans);
 }
+
 #[test]
 fn test_get_coeffs2() {
     let coeffs = get_coeffs::<2, 2>();
@@ -572,4 +579,9 @@ fn test_get_coeffs2() {
     ];
 
     assert_eq!(coeffs, ans);
+}
+
+#[test]
+fn test_get_coeffs10() {
+    get_coeffs::<1, 10>();
 }

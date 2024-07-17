@@ -515,8 +515,8 @@ pub fn get_coeffs_f32<const WINDOW: usize, const M: usize>() -> &'static [f32] {
     if 25 < WINDOW {
         panic!("WINDOW must be 0 <= WINDOW < 25");
     }
-    if 0 < M && 10 < M {
-        panic!("M must be 1 <= M < 10");
+    if !(1..=10).contains(&M) {
+        panic!("M must be 1 <= M <= 10");
     }
     //let m @ 1..9 = M else {
     //    panic!("silly but I like it");
@@ -538,6 +538,12 @@ fn test_coeffs_f32() {
 }
 
 #[test]
+#[should_panic(expected = "M must be")]
+fn test_get_coeffs0_f32() {
+    get_coeffs_f32::<3, 0>();
+}
+
+#[test]
 fn test_get_coeffs1_f32() {
     let coeffs = get_coeffs_f32::<1, 1>();
     let ans = [
@@ -548,6 +554,7 @@ fn test_get_coeffs1_f32() {
 
     assert_eq!(coeffs, ans);
 }
+
 #[test]
 fn test_get_coeffs2_f32() {
     let coeffs = get_coeffs_f32::<2, 2>();
@@ -560,4 +567,9 @@ fn test_get_coeffs2_f32() {
     ];
 
     assert_eq!(coeffs, ans);
+}
+
+#[test]
+fn test_get_coeffs10() {
+    get_coeffs_f32::<1, 10>();
 }
