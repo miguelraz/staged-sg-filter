@@ -4,6 +4,7 @@ version = "0.2.2"
 edition = "2021"
 license = "MIT"
 description = "A staged programming implementation for Savitzky-Golay filters. Loops go brrr."
+repository = "https://github.com/miguelraz/staged-sg-filter"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
