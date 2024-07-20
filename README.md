@@ -5,7 +5,7 @@
 * `rayon` support is available via a `rayon` feature flag
 * Still some SIMD perf left on the table - newer versions will focus on perf
 
-* Remember to compile this with `RUSTFLAGS="-C target-cpu=native"`.
+* Remember to compile this with `RUSTFLAGS="-C target-cpu=native target-feature=+avx2,+fma"`.
 
 This code is based on another code I adapted in Julia with much help from others, see [StagedFilters.jl](https://github.com/miguelraz/StagedFilters.jl).
 
@@ -56,7 +56,7 @@ divan      fastest       │ slowest       │ median        │ mean          �
 ╰─ savgol  205.8 ms      │ 297.4 ms      │ 218.5 ms      │ 219.6 ms      │ 100     │ 100
 ```
 
-which means it's churning through about `10_000_000/0.2 ≈ 5e7` elements per second or `5e7 * 10e-9 ≈ 0.5` elements per nanosecond. Not bad!
+which means it's churning through about `10_000_000/0.2 ≈ 5e7` elements per second or `5e7 * 10^-9 ≈ 0.05` elements per nanosecond. Can still be improved!
 
 ## Notes
 
@@ -85,5 +85,6 @@ Decent efforts have been made to ensure
 - [X] fma support
 - [X] f32/f64 float support
 - [ ] SIMD support
+- [ ] GPU support / ping Manuel Drehwald
 - [ ] `no_std` support see([Effective Rust link](https://www.lurklurk.org/effective-rust/no-std.html))
 - [ ] support derivatives (stretch goal - sponsor me???)

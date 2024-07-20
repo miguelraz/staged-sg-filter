@@ -77,17 +77,19 @@ fn div_ct_loop() -> f32 {
 }
 
 */
-#[divan::bench]
-fn savgol() -> f64 {
-    let v = vec![10.0; 10_000_000];
-    let mut buf = vec![0.0; 10_000_000];
-    sav_gol::<1, 1>(bb(&mut buf), bb(&v));
+#[divan::bench(sample_size = 3, sample_count = 3)]
+fn savgol_f64() -> f64 {
+    let n =  100_000_000;
+    let v = vec![10.0; n];
+    let mut buf = vec![0.0; n];
+    sav_gol::<2, 2>(bb(&mut buf), bb(&v));
     buf[0]
 }
-#[divan::bench]
+#[divan::bench(sample_size = 3, sample_count = 3)]
 fn savgol_f32() -> f32 {
-    let v = vec![10.0f32; 10_000_000];
-    let mut buf = vec![0.0f32; 10_000_000];
-    sav_gol_f32::<1, 1>(bb(&mut buf), bb(&v));
+    let n = 100_000_000;
+    let v = vec![10.0f32; n];
+    let mut buf = vec![0.0f32; n];
+    sav_gol_f32::<2, 2>(bb(&mut buf), bb(&v));
     buf[0]
 }
