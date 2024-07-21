@@ -1,10 +1,26 @@
 //use staged_sg_filter::par_sav_gol;
-use staged_sg_filter::sav_gol;
+use staged_sg_filter::{sav_gol, sav_gol_f32};
 
 fn main() {
-    let v = vec![10.0; 500_000];
-    let mut buf = vec![0.0; 500_000];
-    sav_gol::<1, 1>(&mut buf, &v);
+    let n = 100_000_000;
+    // f32
+    let v = vec![10.0f32; n];
+    let mut buf = vec![0.0f32; n];
+    let start = std::time::Instant::now();
+    sav_gol_f32::<2, 2>(&mut buf, &v);
+    let duration = start.elapsed();
 
-    println!("{:?}", &buf[0..10]);
+    println!("f32: {:?}", duration);
+    println!("{:?}", &buf[0..3]);
+
+    // f64
+    let v = vec![10.0; n];
+    let mut buf = vec![0.0; n];
+    let start = std::time::Instant::now();
+    sav_gol::<2, 2>(&mut buf, &v);
+    let duration = start.elapsed();
+
+    println!("f64: {:?}", duration);
+    println!("{:?}", &buf[0..3]);
+
 }
