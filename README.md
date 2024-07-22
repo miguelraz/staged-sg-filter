@@ -16,7 +16,6 @@ This code is based on another code I adapted in Julia with much help from others
 The other `savgol-rs` implementation offers this speed:
 
 ```rust
-// took 52s
 use savgol_rs::*;
 fn main() {
     let input = SavGolInput {
@@ -31,7 +30,7 @@ fn main() {
 }
 ```
 
-whereas this crate
+takes about `52s`, whereas this crate
 
 ```rust
 use staged_sg_filter::sav_gol;
@@ -46,7 +45,7 @@ fn main() {
 }
 ```
 
-runs in about 200ms, which means it's churning through about `100_000_000/0.2 ≈ 5e8` elements per second or `5e7 * 10^-9 ≈ 0.5` elements per nanosecond.
+runs in about `200ms` in 20x the data size. We're roughly churning through about `100_000_000/0.2 ≈ 5e8` elements per second or `5e8 * 10^-9 ≈ 0.5` elements per nanosecond.
 
 This can still be improved by about a 4x factor, which is the current speed of the Julia code.
 
