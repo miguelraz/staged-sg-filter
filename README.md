@@ -5,7 +5,7 @@
 * `rayon` support is available via a `rayon` feature flag
 * Still some SIMD perf left on the table - newer versions will focus on perf
 
-* Remember to compile this with `RUSTFLAGS="-C target-cpu=native target-feature=+avx2,+fma"`.
+* Remember to compile this with `RUSTFLAGS="-C target-cpu=native"`.
 
 This code is based on another code I adapted in Julia with much help from others, see [StagedFilters.jl](https://github.com/miguelraz/StagedFilters.jl).
 
@@ -37,26 +37,18 @@ whereas this crate
 use staged_sg_filter::sav_gol;
 
 fn main() {
-    let v = vec![10.0; 500_000];
-    let mut buf = vec![0.0; 500_000];
+    let n = 100_000_000;
+    let v = vec![10.0; n];
+    let mut buf = vec![0.0; n];
     sav_gol::<1, 1>(&mut buf, &v);
 
     println!("{:?}", &buf[0..10]);
 }
 ```
 
-runs in about 100ms.
+runs in about 200ms, which means it's churning through about `100_000_000/0.2 ≈ 5e8` elements per second or `5e7 * 10^-9 ≈ 0.5` elements per nanosecond.
 
-Using `divan` on a vector of `10_000_000` `f64`'s gives::
-
-```
-     Running benches\divan.rs (target\release\deps\divan-fb5954a85863758b.exe)
-Timer precision: 100 ns
-divan      fastest       │ slowest       │ median        │ mean          │ samples │ iters
-╰─ savgol  205.8 ms      │ 297.4 ms      │ 218.5 ms      │ 219.6 ms      │ 100     │ 100
-```
-
-which means it's churning through about `10_000_000/0.2 ≈ 5e7` elements per second or `5e7 * 10^-9 ≈ 0.05` elements per nanosecond. Can still be improved!
+This can still be improved by about a 4x factor, which is the current speed of the Julia code.
 
 ## Notes
 
