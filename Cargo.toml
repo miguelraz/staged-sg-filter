@@ -1,6 +1,6 @@
 [package]
 name = "staged-sg-filter"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 license = "MIT"
 description = "A staged programming implementation for Savitzky-Golay filters. Loops go brrr."
