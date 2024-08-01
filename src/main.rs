@@ -7,7 +7,7 @@ fn main() {
     let v = vec![10.0f32; n];
     let mut buf = vec![0.0f32; n];
     let start = std::time::Instant::now();
-    sav_gol_f32::<1, 1>(&mut buf, &v);
+    sav_gol_f32::<2, 2>(&mut buf, &v);
     let duration = start.elapsed();
 
     println!("f32: {:?}", duration);
@@ -17,10 +17,11 @@ fn main() {
     let v = vec![10.0; n];
     let mut buf = vec![0.0; n];
     let start = std::time::Instant::now();
-    sav_gol::<1, 1>(&mut buf, &v);
+    sav_gol::<2, 2>(&mut buf, &v);
     let duration = start.elapsed();
 
     println!("f64: {:?}", duration);
     println!("{:?}", &buf[0..3]);
+
 
 }
