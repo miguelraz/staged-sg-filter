@@ -1,7 +1,6 @@
+use divan::Bencher;
 use staged_sg_filter::{sav_gol, sav_gol_f32};
-//use staged_sg_filter::utils::*;
-
-use divan::black_box as bb;
+use std::hint::black_box as bb;
 
 fn main() {
     // Run registered benchmarks.
@@ -75,21 +74,22 @@ fn div_rt_loop() -> f32 {
 fn div_ct_loop() -> f32 {
     div_consttime_loop::<2>(bb(100.0))
 }
-
 */
-#[divan::bench(sample_size = 3, sample_count = 3)]
-fn savgol_f64() -> f64 {
-    let n =  100_000_000;
+
+#[divan::bench]
+fn savgol_f64(bencher: Bencher) {
+    let n = 100_000_000;
     let v = vec![10.0; n];
-    let mut buf = vec![0.0; n];
-    sav_gol::<2, 2>(bb(&mut buf), bb(&v));
-    buf[0]
+    bencher
+        .with_inputs(|| vec![0.0; n])
+        .bench_local_values(|mut buf| sav_gol::<2, 2>(bb(&mut buf), bb(&v)));
 }
-#[divan::bench(sample_size = 3, sample_count = 3)]
-fn savgol_f32() -> f32 {
+
+#[divan::bench]
+fn savgol_f32(bencher: Bencher) {
     let n = 100_000_000;
     let v = vec![10.0f32; n];
-    let mut buf = vec![0.0f32; n];
-    sav_gol_f32::<2, 2>(bb(&mut buf), bb(&v));
-    buf[0]
+    bencher
+        .with_inputs(|| vec![0.0; n])
+        .bench_local_values(|mut buf| sav_gol_f32::<2, 2>(bb(&mut buf), bb(&v)));
 }

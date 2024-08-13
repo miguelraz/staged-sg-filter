@@ -10,32 +10,32 @@ pub mod coeffs_f32;
 /// Small utility function to clean up the `sav_gol` filter
 #[inline]
 pub fn dot_prod_update(buf: &mut f64, data: &[f64], coeffs: &[f64]) {
-    if !cfg!(feature = "std") {
-    *buf = data
-        .iter()
-        .zip(coeffs.iter())
-        .fold(0.0f64, |acc, (a, b)| a.mul_add(*b, acc));
-    } else {
-    *buf = data
-        .iter()
-        .zip(coeffs.iter())
-        .fold(0.0f64, |acc, (a, b)| a * (*b) + acc);
-    }
+    *buf = data.iter().zip(coeffs.iter()).fold(0.0f64, |acc, (a, b)| {
+        #[cfg(feature = "std")]
+        {
+            a.mul_add(*b, acc)
+        }
+
+        #[cfg(not(feature = "std"))]
+        {
+            a * (*b) + acc
+        }
+    });
 }
 
 #[inline]
 pub fn dot_prod_update_f32(buf: &mut f32, data: &[f32], coeffs: &[f32]) {
-    if !cfg!(feature = "std") {
-    *buf = data
-        .iter()
-        .zip(coeffs.iter())
-        .fold(0.0f32, |acc, (a, b)| a.mul_add(*b, acc));
-    } else {
-    *buf = data
-        .iter()
-        .zip(coeffs.iter())
-        .fold(0.0f32, |acc, (a, b)| a * (*b) + acc);
-    }
+    *buf = data.iter().zip(coeffs.iter()).fold(0.0f32, |acc, (a, b)| {
+        #[cfg(feature = "std")]
+        {
+            a.mul_add(*b, acc)
+        }
+
+        #[cfg(not(feature = "std"))]
+        {
+            a * (*b) + acc
+        }
+    });
 }
 
 #[test]
@@ -140,12 +140,12 @@ fn test_sav_golf32() {
 // cargo asm --lib
 #[inline(never)]
 pub fn asm_dump_f64(buf: &mut [f64], data: &mut [f64]) {
-    sav_gol::<2, 2>(buf, &data);
+    sav_gol::<2, 2>(buf, data);
 }
 
 #[inline(never)]
 pub fn asm_dump_f32(buf: &mut [f32], data: &mut [f32]) {
-    sav_gol_f32::<2, 2>(buf, &data);
+    sav_gol_f32::<2, 2>(buf, data);
 }
 
 #[cfg(feature = "rayon")]
@@ -159,7 +159,7 @@ pub fn par_sav_gol<const WINDOW: usize, const M: usize>(buf: &mut [f64], data: &
         .zip(data.par_windows(window_size))
         .take(body_size)
         .for_each(|(buf, data)| {
-            dot_prod_update(buf, &data, &coeffs);
+            dot_prod_update(buf, data, coeffs);
         });
 }
 
@@ -174,6 +174,6 @@ pub fn par_sav_gol_f32<const WINDOW: usize, const M: usize>(buf: &mut [f32], dat
         .zip(data.par_windows(window_size))
         .take(body_size)
         .for_each(|(buf, data)| {
-            dot_prod_update(buf, &data, &coeffs);
+            dot_prod_update_f32(buf, data, coeffs);
         });
 }

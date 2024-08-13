@@ -549,7 +549,7 @@ pub fn get_coeffs<const WINDOW: usize, const M: usize>() -> &'static [f64] {
 #[test]
 fn test_coeffs() {
     let coeffs = COEFFS[0][0];
-    let ans = [0.3333333333333332, 0.33333333333333333, 0.3333333333333334];
+    let ans = [0.3333333333333332, 0.3333333333333333, 0.3333333333333334];
     assert_eq!(coeffs, ans);
 }
 
@@ -562,7 +562,7 @@ fn test_get_coeffs0() {
 #[test]
 fn test_get_coeffs1() {
     let coeffs = get_coeffs::<1, 1>();
-    let ans = [0.3333333333333332, 0.33333333333333333, 0.3333333333333334];
+    let ans = [0.3333333333333332, 0.3333333333333333, 0.3333333333333334];
 
     assert_eq!(coeffs, ans);
 }

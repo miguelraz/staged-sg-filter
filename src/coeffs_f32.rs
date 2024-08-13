@@ -1,3 +1,4 @@
+#[allow(clippy::excessive_precision)]
 #[rustfmt::skip]
 pub const COEFFS_F32: [[&[f32]; 25]; 10] = [
 //1 1
